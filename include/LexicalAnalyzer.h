@@ -14,9 +14,12 @@
 /// </summary>
 class LexicalAnalyzer
 {
-public:
+private:
 	double readNum(const std::string& s, int& pos);
 	std::string readVar(const std::string& s, int& pos);
+	void variablesCheck(std::vector<Term*>& st, std::map<std::string, double>& data);
+public:
+	
 	std::vector<Term*> analysis(const std::string& s, std::map<std::string, double>&);
 };
 

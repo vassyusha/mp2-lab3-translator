@@ -34,6 +34,24 @@ std::string LexicalAnalyzer::readVar(const std::string& s, int& pos) {
 	return name;
 }
 
+void LexicalAnalyzer::variablesCheck(std::vector<Term*>& st, std::map<std::string, double>& data) {
+	for (int i = 0; i < st.size(); i++) {
+		Variable* pv = dynamic_cast<Variable*>(st[i]);
+		if (pv != nullptr) {
+			std::string name = pv->getName();
+			Function<double>* pf = nullptr;
+			if (i != st.size() - 1) pf = dynamic_cast<Function<double>*>(st[i + 1]);
+			if (i == st.size() - 1 || pf == nullptr || !pf->is_assign()) {
+				if (data.count(name) == 1) {
+					delete(st[i]);
+					st[i] = new Number<>(data[name]);
+				}
+				else throw "you're trying to use undefine variable";
+			}
+		}
+	}
+}
+
 std::vector<Term*> LexicalAnalyzer::analysis(const std::string& s, std::map<std::string, double>& data) {
 
 	std::vector<Term*> st;
@@ -80,20 +98,7 @@ std::vector<Term*> LexicalAnalyzer::analysis(const std::string& s, std::map<std:
 
 	}
 
-	for (int i = 0; i < st.size(); i++) {
-		Variable* pv = dynamic_cast<Variable*>(st[i]);
-		if (pv != nullptr) {
-			std::string name = pv->getName();
-			Function<double>* pf = nullptr;
-			if(i != st.size() - 1) pf = dynamic_cast<Function<double>*>(st[i + 1]);
-			if (i == st.size() - 1 || pf == nullptr || !pf->is_assign()) {
-				if (data.count(name) == 1) {
-					delete(st[i]);
-					st[i] = new Number<>(data[name]);
-				}else throw "you're trying to use undefine variable";
-			}	
-		}
-	}
+	this->variablesCheck(st, data);
 
 	return st;
 }
